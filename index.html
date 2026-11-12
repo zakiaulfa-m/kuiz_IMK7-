@@ -1,0 +1,612 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wayground - Gamifikasi dalam IMK</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: #2b1035;
+            color: #ffffff;
+        }
+        .wayground-gradient {
+            background: linear-gradient(135deg, #461158 0%, #2b1035 100%);
+        }
+        .card-shadow {
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.4);
+        }
+        @keyframes pulse-slow {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.03); }
+        }
+        .animate-pulse-slow {
+            animation: pulse-slow 3s infinite ease-in-out;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col selection:bg-purple-500 selection:text-white">
+
+    <!-- Top Navigation Bar -->
+    <header class="w-full bg-[#351443] border-b border-purple-900/50 px-6 py-3 flex justify-between items-center z-50">
+        <div class="flex items-center space-x-3">
+            <div class="bg-purple-600 p-2 rounded-xl flex items-center justify-center shadow-lg">
+                <i class="fa-solid fa-gamepad text-white text-xl"></i>
+            </div>
+            <span class="text-2xl font-black tracking-wider bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">WAYGROUND</span>
+            <span class="text-xs uppercase bg-purple-900/80 text-purple-300 font-bold px-2 py-0.5 rounded-full border border-purple-700/50 hidden sm:inline">IMK Quiz</span>
+        </div>
+        
+        <div class="flex items-center space-x-4">
+            <!-- Coin badge -->
+            <div class="flex items-center bg-[#461158] border border-purple-700/60 px-3 py-1.5 rounded-full shadow-inner">
+                <div class="w-6 h-6 rounded-full bg-amber-400 flex items-center justify-center text-amber-900 font-bold text-xs mr-2 shadow">
+                    <i class="fa-solid fa-coins"></i>
+                </div>
+                <span id="nav-coins" class="font-extrabold text-amber-300 text-sm">966</span>
+            </div>
+
+            <!-- Profile Dashboard Pill -->
+            <div class="hidden md:flex items-center space-x-2 bg-purple-950/60 border border-purple-800/60 px-3 py-1.5 rounded-full">
+                <div class="w-7 h-7 rounded-full bg-purple-500 flex items-center justify-center font-bold text-xs text-white">
+                    <i class="fa-solid fa-user-astronaut"></i>
+                </div>
+                <span class="font-semibold text-sm">Zakia's dashboard</span>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main App Container -->
+    <main class="flex-1 flex flex-col items-center justify-center p-4 relative overflow-hidden">
+        
+        <!-- Background decorative elements -->
+        <div class="absolute -top-40 -left-40 w-96 h-96 bg-purple-600/10 rounded-full blur-3xl pointer-events-none"></div>
+        <div class="absolute -bottom-40 -right-40 w-96 h-96 bg-pink-600/10 rounded-full blur-3xl pointer-events-none"></div>
+
+        <!-- VIEW 1: ENTER GAME CODE -->
+        <div id="view-code" class="w-full max-w-xl mx-auto text-center z-10 transition-all duration-300">
+            <div class="mb-8">
+                <span class="text-xs font-bold uppercase tracking-widest text-purple-400 bg-purple-950/80 px-3 py-1 rounded-full border border-purple-800/50">Interaktif Pembelajaran</span>
+                <h1 class="text-4xl md:text-5xl font-black mt-4 tracking-tight">Gamifikasi dalam IMK</h1>
+                <p class="text-purple-300 mt-2 text-sm md:text-base">Masukkan kode 6-digit untuk memulai tantangan kuis interaktif Anda.</p>
+            </div>
+
+            <div class="wayground-gradient border border-purple-800/60 p-8 rounded-3xl card-shadow relative">
+                <div class="absolute -right-6 -bottom-6 text-7xl opacity-20 pointer-events-none">
+                    <i class="fa-solid fa-dice text-purple-400"></i>
+                </div>
+
+                <div class="space-y-4">
+                    <div class="relative">
+                        <input type="text" id="game-code-input" maxlength="6" value="902104" placeholder="Masukkan 6 digit kode..." 
+                            class="w-full py-4 px-6 text-center text-2xl md:text-3xl font-black tracking-widest text-purple-950 bg-white rounded-2xl focus:outline-none focus:ring-4 focus:ring-pink-500 transition shadow-inner">
+                    </div>
+                    
+                    <button onclick="joinGame()" class="w-full py-4 bg-gradient-to-r from-pink-600 to-purple-600 hover:from-pink-500 hover:to-purple-500 text-white font-extrabold text-lg rounded-2xl shadow-lg transform active:scale-95 transition flex items-center justify-center space-x-2">
+                        <span>Join</span>
+                        <i class="fa-solid fa-arrow-right"></i>
+                    </button>
+                    <button onclick="showLeaderboard()" class="w-full py-3 bg-purple-950/70 hover:bg-purple-900 text-purple-200 font-bold rounded-2xl border border-purple-700/60 transition flex items-center justify-center space-x-2">
+                        <i class="fa-solid fa-ranking-star"></i>
+                        <span>Lihat Peringkat</span>
+                    </button>
+
+                    <div id="code-error" class="hidden py-3 px-4 bg-rose-500/20 border border-rose-500/50 text-rose-200 rounded-xl text-sm font-semibold flex items-center justify-center space-x-2">
+                        <i class="fa-solid fa-triangle-exclamation"></i>
+                        <span id="error-text">Invalid game code</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mt-8 text-xs text-purple-400 flex items-center justify-center space-x-4">
+                <span><i class="fa-solid fa-shield-halved mr-1"></i> Mode Aman</span>
+                <span>•</span>
+                <span><i class="fa-solid fa-bolt mr-1"></i> Real-time Feedback</span>
+                <span>•</span>
+                <span><i class="fa-solid fa-award mr-1"></i> Poin & Koin</span>
+            </div>
+        </div>
+
+        <!-- VIEW 2: QUIZ INTERACTIVE SCREEN -->
+        <div id="view-quiz" class="w-full max-w-3xl mx-auto z-10 hidden">
+            <!-- Quiz Header Stats -->
+            <div class="flex justify-between items-center mb-6 bg-[#351443]/80 border border-purple-800/50 px-6 py-3 rounded-2xl backdrop-blur">
+                <div class="flex items-center space-x-3">
+                    <span class="bg-purple-600/40 text-purple-300 text-xs font-bold px-3 py-1 rounded-lg border border-purple-500/30">
+                        Soal <span id="current-q-num">1</span>/10
+                    </span>
+                    <div class="flex items-center text-amber-400 text-sm font-bold">
+                        <i class="fa-solid fa-fire text-orange-500 mr-1.5 animate-bounce"></i>
+                        <span id="streak-counter">0</span> Streak
+                    </div>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <div class="text-right">
+                        <span class="text-xs text-purple-400 block font-medium">SKOR</span>
+                        <span id="score-display" class="font-black text-xl text-pink-400">0</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Progress Bar -->
+            <div class="w-full bg-purple-950 h-2.5 rounded-full mb-6 overflow-hidden border border-purple-900">
+                <div id="progress-bar" class="bg-gradient-to-r from-pink-500 to-purple-500 h-full transition-all duration-300" style="width: 10%;"></div>
+            </div>
+
+            <!-- Question Card -->
+            <div class="wayground-gradient border border-purple-800/60 p-6 md:p-8 rounded-3xl card-shadow mb-6">
+                <h2 id="question-text" class="text-xl md:text-2xl font-bold leading-relaxed mb-6">
+                    Memuat pertanyaan...
+                </h2>
+
+                <!-- Options Grid -->
+                <div id="options-container" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <!-- Dynamic Options will be injected here -->
+                </div>
+            </div>
+
+            <!-- Bottom Action Bar (Next Button) -->
+            <div class="flex justify-end">
+                <button id="next-btn" onclick="nextQuestion()" class="hidden px-8 py-3.5 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-extrabold rounded-2xl shadow-lg transform active:scale-95 transition flex items-center space-x-2">
+                    <span>Lanjut</span>
+                    <i class="fa-solid fa-chevron-right"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- VIEW 3: RESULTS SCREEN -->
+        <div id="view-results" class="w-full max-w-2xl mx-auto text-center z-10 hidden">
+            <div class="wayground-gradient border border-purple-800/60 p-8 md:p-10 rounded-3xl card-shadow">
+                <div class="w-20 h-20 bg-amber-500/20 border-2 border-amber-400 rounded-full flex items-center justify-center mx-auto mb-6 text-amber-400 text-3xl shadow-lg">
+                    <i class="fa-solid fa-trophy"></i>
+                </div>
+
+                <h2 class="text-3xl font-black mb-2">Kuis Selesai!</h2>
+                <p class="text-purple-300 text-sm mb-6">Hebat! Anda telah menyelesaikan seluruh soal Gamifikasi dalam IMK.</p>
+
+                <div class="grid grid-cols-3 gap-4 mb-8">
+                    <div class="bg-purple-950/60 p-4 rounded-2xl border border-purple-800/50">
+                        <span class="text-xs text-purple-400 block font-semibold mb-1">SKOR AKHIR</span>
+                        <span id="final-score" class="text-2xl font-black text-pink-400">0</span>
+                    </div>
+                    <div class="bg-purple-950/60 p-4 rounded-2xl border border-purple-800/50">
+                        <span class="text-xs text-purple-400 block font-semibold mb-1">JAWABAN BENAR</span>
+                        <span id="final-correct" class="text-2xl font-black text-emerald-400">0/10</span>
+                    </div>
+                    <div class="bg-purple-950/60 p-4 rounded-2xl border border-purple-800/50">
+                        <span class="text-xs text-purple-400 block font-semibold mb-1">KOIN DIDAPAT</span>
+                        <span id="final-coins" class="text-2xl font-black text-amber-400">+150</span>
+                    </div>
+                </div>
+
+                <div class="flex flex-col sm:flex-row gap-4 justify-center">
+                    <button onclick="restartQuiz()" class="px-8 py-4 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-500 hover:to-pink-500 text-white font-extrabold rounded-2xl shadow-lg transform active:scale-95 transition flex items-center justify-center space-x-2">
+                        <i class="fa-solid fa-rotate-right"></i>
+                        <span>Mainkan Lagi</span>
+                    </button>
+                    <button onclick="reviewAnswers()" class="px-8 py-4 bg-purple-900/80 hover:bg-purple-800 text-purple-200 font-bold rounded-2xl border border-purple-700/60 transition flex items-center justify-center space-x-2">
+                        <i class="fa-solid fa-list-check"></i>
+                        <span>Tinjau Jawaban</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- VIEW 5: LEADERBOARD SCREEN -->
+        <div id="view-leaderboard" class="w-full max-w-3xl mx-auto z-10 hidden pb-12">
+            <div class="flex justify-between items-center mb-6">
+                <div>
+                    <span class="text-xs font-bold uppercase tracking-widest text-purple-400">Papan Peringkat</span>
+                    <h2 class="text-2xl md:text-3xl font-black mt-1">Peringkat Pemain</h2>
+                </div>
+                <button onclick="backFromLeaderboard()" class="px-4 py-2 bg-purple-900 hover:bg-purple-800 text-sm font-semibold rounded-xl border border-purple-700/50 transition">
+                    <i class="fa-solid fa-arrow-left mr-2"></i> Kembali
+                </button>
+            </div>
+
+            <div class="wayground-gradient border border-purple-800/60 p-6 md:p-8 rounded-3xl card-shadow">
+                <p class="text-purple-300 text-sm mb-5">Peringkat diurutkan berdasarkan skor tertinggi. Hasil tersimpan pada browser/perangkat ini.</p>
+                <div id="leaderboard-list" class="space-y-3"></div>
+                <p id="leaderboard-empty" class="hidden text-center text-purple-300 py-8">Belum ada hasil kuis. Selesaikan kuis untuk masuk ke papan peringkat!</p>
+                <button onclick="clearLeaderboard()" class="mt-6 text-xs text-rose-300 hover:text-rose-200 underline">Hapus riwayat peringkat pada perangkat ini</button>
+            </div>
+        </div>
+
+        <!-- VIEW 4: REVIEW SCREEN -->
+        <div id="view-review" class="w-full max-w-3xl mx-auto z-10 hidden pb-12">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-2xl font-black">Tinjauan Hasil Kuis</h2>
+                <button onclick="backToResults()" class="px-4 py-2 bg-purple-900 hover:bg-purple-800 text-sm font-semibold rounded-xl border border-purple-700/50 transition">
+                    <i class="fa-solid fa-arrow-left mr-2"></i> Kembali
+                </button>
+            </div>
+            <div id="review-list" class="space-y-4">
+                <!-- Injected review items -->
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="w-full py-4 text-center text-xs text-purple-400 border-t border-purple-900/50 bg-[#351443]/40">
+        Wayground (formerly Quizizz) • Modul Kuis Gamifikasi Interaktif dalam Interaksi Manusia & Komputer
+    </footer>
+
+    <!-- Audio synthesizer visualizer / feedback simulator (No external audio files required) -->
+    <script>
+        // Quiz Questions Data (Gamifikasi dalam IMK)
+        const quizData = [
+            {
+                question: "Sebuah aplikasi kebugaran menerapkan mekanisme di mana pengguna mendapatkan lencana khusus ketika berhasil mencatatkan olahraga 7 hari berturut-turut. Elemen desain apa yang paling tepat merepresentasikan lencana ini dalam konteks IMK?",
+                options: [
+                    "Pencapaian.",
+                    "Sanksi sosial.",
+                    "Hukuman acak.",
+                    "Navigasi mutlak."
+                ],
+                correct: 0
+            },
+            {
+                question: "Dalam perancangan antarmuka aplikasi pembelajaran bahasa, desainer menggunakan progress bar persentase penyelesaian modul harian. Prinsip psikologis apa yang terutama didorong oleh elemen ini untuk meningkatkan keterlibatan pengguna?",
+                options: [
+                    "Efek kelelahan visual.",
+                    "Efek gradasi tujuan.",
+                    "Prinsip gestalt isolasi.",
+                    "Hukum Hick pada menu."
+                ],
+                correct: 1
+            },
+            {
+                question: "Sebuah platform e-commerce ingin menerapkan sistem poin, namun gagal karena pengguna merasa poin yang dikumpulkan tidak memiliki nilai nyata atau kegunaan di dalam sistem. Kesalahan apa dalam perancangan antarmuka gamifikasi yang terjadi?",
+                options: [
+                    "Warna tombol terlalu kontras.",
+                    "Kurangnya utilitas imbalan.",
+                    "Navigasi terlalu cepat.",
+                    "Font teks kurang besar."
+                ],
+                correct: 1
+            },
+            {
+                question: "Dalam konteks desain interaksi berbasis Octalysis Framework (Yu-kai Chou), dorongan motivasi apa yang diaktifkan ketika pengguna diberi tahu bahwa kesempatan untuk mendapatkan diskon khusus melalui misi interaktif akan segera berakhir dalam 1 jam?",
+                options: [
+                    "Pemberdayaan kreativitas.",
+                    "Kepemilikan dan kepemilikan aset.",
+                    "Kelangkaan dan ketidaksabaran.",
+                    "Pengaruh sosial dan keterkaitan."
+                ],
+                correct: 2
+            },
+            {
+                question: "Manakah dari penerapan berikut yang paling tepat dalam mendesain papan peringkat (leaderboard) yang inklusif untuk menghindari penurunan motivasi pada pengguna baru atau yang berkinerja rendah?",
+                options: [
+                    "Menampilkan hanya 3 peringkat teratas secara global tanpa filter.",
+                    "Menampilkan peringkat berbasis kelompok lokal atau teman sebaya.",
+                    "Menghapus seluruh papan peringkat dari sistem.",
+                    "Memberikan hukuman poin pada peringkat terbawah."
+                ],
+                correct: 1
+            },
+            {
+                question: "Dalam perancangan alur pengalaman pengguna (user journey) gamifikasi, fase 'Onboarding' harus dirancang secara khusus agar...",
+                options: [
+                    "Pengguna memahami mekanisme dasar dengan cepat dan merasa disambut.",
+                    "Pengguna langsung menghadapi ujian tingkat mahir.",
+                    "Pengguna kesulitan menemukan menu utama.",
+                    "Pengguna langsung melihat iklan komersial."
+                ],
+                correct: 0
+            },
+            {
+                question: "Mengapa penerapan elemen kejutan (random rewards atau loot boxes) dalam desain antarmuka harus dipertimbangkan secara etis dalam IMK?",
+                options: [
+                    "Dapat memicu pola adiksi perilaku yang berlebihan pada pengguna.",
+                    "Membuat server aplikasi menjadi lebih lambat.",
+                    "Menurunkan jumlah unduhan secara drastis.",
+                    "Tidak ada pengaruh sama sekali pada psikologi."
+                ],
+                correct: 0
+            },
+            {
+                question: "Sebuah aplikasi pelacak produktivitas kerja mengubah tugas rutin menjadi pencarian level (quests). Perubahan pendekatan ini dalam IMK bertujuan utama untuk...",
+                options: [
+                    "Meningkatkan motivasi intrinsik melalui keterlibatan emosional.",
+                    "Menambah beban memori jangka pendek pengguna.",
+                    "Mengurangi ukuran file aplikasi.",
+                    "Menghilangkan kebutuhan akan antarmuka grafis."
+                ],
+                correct: 0
+            },
+            {
+                question: "Dalam konteks evaluasi antarmuka gamifikasi, apa indikator utama bahwa elemen 'Avatar' atau profil kustomisasi berhasil diterapkan?",
+                options: [
+                    "Pengguna merasa memiliki keterikatan personal dan ekspresi diri.",
+                    "Aplikasi berjalan tanpa koneksi internet.",
+                    "Warna latar belakang selalu berwarna hitam.",
+                    "Tombol navigasi menjadi tersembunyi."
+                ],
+                correct: 0
+            },
+            {
+                question: "Manakah pernyataan yang paling akurat dalam membedakan antara 'Gamifikasi' (Gamification) dan 'Permainan Serius' (Serious Games) dalam ranah IMK?",
+                options: [
+                    "Gamifikasi menggunakan elemen game pada konteks non-game, sedangkan Serious Games adalah game utuh yang dibuat untuk tujuan pembelajaran.",
+                    "Gamifikasi hanya untuk anak-anak, Serious Games untuk profesional.",
+                    "Tidak ada perbedaan sama sekali di antara keduanya.",
+                    "Gamifikasi selalu memerlukan konsol game khusus."
+                ],
+                correct: 0
+            }
+        ];
+
+        let currentQuestionIndex = 0;
+        let score = 0;
+        let streak = 0;
+        let correctCount = 0;
+        let userAnswers = new Array(quizData.length).fill(null);
+        let userCoins = 966;
+
+        function joinGame() {
+            const codeInput = document.getElementById('game-code-input').value.trim();
+            const errorDiv = document.getElementById('code-error');
+            
+            if (codeInput.length !== 6 || isNaN(codeInput)) {
+                errorDiv.classList.remove('hidden');
+                document.getElementById('error-text').innerText = "Masukkan tepat 6 digit kode angka (contoh: 902104)";
+                return;
+            }
+
+            errorDiv.classList.add('hidden');
+            
+            // Transition to Quiz view
+            document.getElementById('view-code').classList.add('hidden');
+            document.getElementById('view-quiz').classList.remove('hidden');
+            loadQuestion();
+        }
+
+        function loadQuestion() {
+            const q = quizData[currentQuestionIndex];
+            document.getElementById('current-q-num').innerText = currentQuestionIndex + 1;
+            document.getElementById('question-text').innerText = q.question;
+            
+            // Update progress bar
+            const progress = ((currentQuestionIndex + 1) / quizData.length) * 100;
+            document.getElementById('progress-bar').style.width = progress + '%';
+
+            const container = document.getElementById('options-container');
+            container.innerHTML = '';
+
+            q.options.forEach((option, index) => {
+                const btn = document.createElement('button');
+                btn.className = "w-full text-left p-5 rounded-2xl bg-purple-950/60 border border-purple-800/70 hover:bg-purple-900/80 hover:border-purple-600 transition font-medium text-sm md:text-base flex items-center justify-between group shadow-sm";
+                btn.innerHTML = `
+                    <div class="flex items-center space-x-3">
+                        <span class="w-8 h-8 rounded-xl bg-purple-900/80 text-purple-300 flex items-center justify-center font-bold text-xs border border-purple-700/50 group-hover:bg-purple-600 group-hover:text-white transition">${String.fromCharCode(65 + index)}</span>
+                        <span>${option}</span>
+                    </div>
+                    <i class="fa-solid fa-chevron-right text-purple-500 opacity-0 group-hover:opacity-100 transition"></i>
+                `;
+                btn.onclick = () => selectOption(index, btn);
+                container.appendChild(btn);
+            });
+
+            document.getElementById('next-btn').classList.add('hidden');
+        }
+
+        function selectOption(selectedIndex, selectedBtn) {
+            const q = quizData[currentQuestionIndex];
+            userAnswers[currentQuestionIndex] = selectedIndex;
+
+            const allButtons = document.getElementById('options-container').getElementsByTagName('button');
+            
+            // Disable all buttons after choice
+            for (let b of allButtons) {
+                b.disabled = true;
+                b.classList.remove('hover:bg-purple-900/80', 'hover:border-purple-600');
+            }
+
+            const isCorrect = (selectedIndex === q.correct);
+
+            if (isCorrect) {
+                selectedBtn.classList.remove('bg-purple-950/60', 'border-purple-800/70');
+                selectedBtn.classList.add('bg-emerald-600/30', 'border-emerald-500', 'text-emerald-100');
+                selectedBtn.querySelector('span').classList.add('bg-emerald-600', 'text-white');
+                
+                score += 100 + (streak * 20);
+                streak++;
+                correctCount++;
+            } else {
+                selectedBtn.classList.remove('bg-purple-950/60', 'border-purple-800/70');
+                selectedBtn.classList.add('bg-rose-600/30', 'border-rose-500', 'text-rose-100');
+                
+                // Highlight correct answer
+                allButtons[q.correct].classList.remove('bg-purple-950/60', 'border-purple-800/70');
+                allButtons[q.correct].classList.add('bg-emerald-600/30', 'border-emerald-500', 'text-emerald-100');
+                
+                streak = 0;
+            }
+
+            // Update UI stats
+            document.getElementById('score-display').innerText = score;
+            document.getElementById('streak-counter').innerText = streak;
+
+            // Show Next button
+            document.getElementById('next-btn').classList.remove('hidden');
+        }
+
+        function nextQuestion() {
+            currentQuestionIndex++;
+            if (currentQuestionIndex < quizData.length) {
+                loadQuestion();
+            } else {
+                showResults();
+            }
+        }
+
+        function showResults() {
+            document.getElementById('view-quiz').classList.add('hidden');
+            document.getElementById('view-results').classList.remove('hidden');
+
+            document.getElementById('final-score').innerText = score;
+            document.getElementById('final-correct').innerText = `${correctCount}/10`;
+            
+            const earnedCoins = correctCount * 15;
+            document.getElementById('final-coins').innerText = `+${earnedCoins}`;
+            userCoins += earnedCoins;
+            document.getElementById('nav-coins').innerText = userCoins;
+
+            saveLeaderboardResult(score, correctCount);
+        }
+
+        function restartQuiz() {
+            currentQuestionIndex = 0;
+            score = 0;
+            streak = 0;
+            correctCount = 0;
+            userAnswers = new Array(quizData.length).fill(null);
+            
+            document.getElementById('view-results').classList.add('hidden');
+            document.getElementById('view-review').classList.add('hidden');
+            document.getElementById('view-leaderboard').classList.add('hidden');
+            document.getElementById('view-code').classList.remove('hidden');
+            document.getElementById('score-display').innerText = '0';
+            document.getElementById('streak-counter').innerText = '0';
+        }
+
+        function reviewAnswers() {
+            document.getElementById('view-results').classList.add('hidden');
+            document.getElementById('view-review').classList.remove('hidden');
+
+            const reviewList = document.getElementById('review-list');
+            reviewList.innerHTML = '';
+
+            quizData.forEach((q, idx) => {
+                const userAns = userAnswers[idx];
+                const isCorrect = (userAns === q.correct);
+                
+                const card = document.createElement('div');
+                card.className = `p-6 rounded-2xl border ${isCorrect ? 'bg-emerald-950/20 border-emerald-500/40' : 'bg-rose-950/20 border-rose-500/40'}`;
+                
+                let optionsHtml = '';
+                q.options.forEach((opt, optIdx) => {
+                    let badgeClass = "bg-purple-900/60 text-purple-300";
+                    if (optIdx === q.correct) {
+                        badgeClass = "bg-emerald-600 text-white font-bold";
+                    } else if (optIdx === userAns && !isCorrect) {
+                        badgeClass = "bg-rose-600 text-white font-bold";
+                    }
+                    optionsHtml += `
+                        <div class="text-xs md:text-sm py-1.5 px-3 rounded-lg flex items-center space-x-2 my-1 bg-purple-950/40 border border-purple-900/50">
+                            <span class="w-6 h-6 rounded-md ${badgeClass} flex items-center justify-center text-xs">${String.fromCharCode(65 + optIdx)}</span>
+                            <span class="${optIdx === q.correct ? 'text-emerald-300 font-semibold' : ''}">${opt}</span>
+                        </div>
+                    `;
+                });
+
+                card.innerHTML = `
+                    <div class="flex items-start justify-between mb-3">
+                        <span class="text-xs font-bold px-2.5 py-1 rounded-md ${isCorrect ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30' : 'bg-rose-500/20 text-rose-300 border border-rose-500/30'}">
+                            Soal ${idx + 1} • ${isCorrect ? 'Benar' : 'Salah'}
+                        </span>
+                    </div>
+                    <h3 class="font-bold text-sm md:text-base mb-3">${q.question}</h3>
+                    <div class="space-y-1">${optionsHtml}</div>
+                `;
+                reviewList.appendChild(card);
+            });
+        }
+
+        // LEADERBOARD: data disimpan di browser yang sedang digunakan.
+        const LEADERBOARD_KEY = 'wayground_imk_leaderboard_v1';
+
+        function getLeaderboard() {
+            try {
+                return JSON.parse(localStorage.getItem(LEADERBOARD_KEY) || '[]');
+            } catch (error) {
+                return [];
+            }
+        }
+
+        function saveLeaderboardResult(finalScore, totalCorrect) {
+            const savedName = localStorage.getItem('wayground_player_name');
+            const playerName = savedName || prompt('Masukkan nama untuk ditampilkan di peringkat:') || 'Pemain';
+            localStorage.setItem('wayground_player_name', playerName.trim().slice(0, 24) || 'Pemain');
+
+            const entries = getLeaderboard();
+            entries.push({
+                name: localStorage.getItem('wayground_player_name'),
+                score: finalScore,
+                correct: totalCorrect,
+                date: new Date().toLocaleDateString('id-ID')
+            });
+            entries.sort((a, b) => b.score - a.score || b.correct - a.correct);
+            localStorage.setItem(LEADERBOARD_KEY, JSON.stringify(entries.slice(0, 20)));
+        }
+
+        function showLeaderboard() {
+            document.getElementById('view-code').classList.add('hidden');
+            document.getElementById('view-quiz').classList.add('hidden');
+            document.getElementById('view-results').classList.add('hidden');
+            document.getElementById('view-review').classList.add('hidden');
+            document.getElementById('view-leaderboard').classList.remove('hidden');
+            renderLeaderboard();
+        }
+
+        function backFromLeaderboard() {
+            document.getElementById('view-leaderboard').classList.add('hidden');
+            document.getElementById('view-code').classList.remove('hidden');
+        }
+
+        function renderLeaderboard() {
+            const entries = getLeaderboard();
+            const list = document.getElementById('leaderboard-list');
+            const empty = document.getElementById('leaderboard-empty');
+            list.innerHTML = '';
+
+            if (entries.length === 0) {
+                empty.classList.remove('hidden');
+                return;
+            }
+
+            empty.classList.add('hidden');
+            entries.forEach((entry, index) => {
+                const row = document.createElement('div');
+                const medal = index === 0 ? '🥇' : index === 1 ? '🥈' : index === 2 ? '🥉' : `#${index + 1}`;
+                row.className = 'flex items-center justify-between gap-3 p-4 rounded-2xl border ' +
+                    (index === 0 ? 'bg-amber-500/10 border-amber-400/50' : 'bg-purple-950/50 border-purple-800/60');
+                row.innerHTML = `
+                    <div class="flex items-center gap-3 min-w-0">
+                        <span class="text-lg font-black w-9 text-center">${medal}</span>
+                        <div class="min-w-0">
+                            <div class="font-bold text-white truncate">${escapeLeaderboardText(entry.name)}</div>
+                            <div class="text-xs text-purple-300">${entry.correct}/10 jawaban benar • ${entry.date}</div>
+                        </div>
+                    </div>
+                    <div class="font-black text-pink-300 text-lg whitespace-nowrap">${entry.score} poin</div>
+                `;
+                list.appendChild(row);
+            });
+        }
+
+        function escapeLeaderboardText(value) {
+            return String(value).replace(/[&<>"']/g, char => ({
+                '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+            }[char]));
+        }
+
+        function clearLeaderboard() {
+            if (confirm('Yakin ingin menghapus seluruh riwayat peringkat di perangkat ini?')) {
+                localStorage.removeItem(LEADERBOARD_KEY);
+                renderLeaderboard();
+            }
+        }
+
+        function backToResults() {
+            document.getElementById('view-review').classList.add('hidden');
+            document.getElementById('view-results').classList.remove('hidden');
+        }
+    </script>
+</body>
+</html>
